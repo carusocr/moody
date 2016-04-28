@@ -1,7 +1,7 @@
 var alexa = require('alexa-app');
 var mysql = require('mysql');
 var iniparser = require('iniparser')
-var config = iniparser.parseSync('apps/moody/db.ini')
+var config = iniparser.parseSync('db.ini')
 var env = process.env.NODE_ENV || 'dev'; //startup nodejs with e.g:  NODE_ENV= node server.js
 
 connection = mysql.createConnection({
