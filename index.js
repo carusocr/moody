@@ -2,28 +2,49 @@ var alexa = require('alexa-app');
 var mysql = require('mysql');
 var iniparser = require('iniparser')
 var config = iniparser.parseSync('db.ini')
-var env = process.env.NODE_ENV || 'dev'; //startup nodejs with e.g:  NODE_ENV= node server.js
+//var env = process.env.NODE_ENV || 'dev'; //startup nodejs with e.g:  NODE_ENV= node server.js
 
-connection = mysql.createConnection({
-    host        : config[env]['host'],
-    user        : config[env]['user'],
-    password    : config[env]['pwd'],
-    database    : config[env]['dbname']
-}),
-
-// Allow this module to be reloaded by hotswap when changed
-module.change_code = 1;
+//connection = mysql.createConnection({
+//    host        : config[env]['host'],
+//    user        : config[env]['user'],
+//    password    : config[env]['pwd'],
+//    database    : config[env]['dbname']
+//}),
 
 // Define an alexa-app
 var app = new alexa.app('moodchecker');
 
 app.launch(function(req,res) {
-	var number = Math.floor(Math.random()*99)+1;
-	res.session('number',number);
-	res.session('guesses',0);
-	var prompt = "Guess a number between 1 and 100!";
-	res.say(prompt).reprompt(prompt).shouldEndSession(false);
+  response.session ('open_session', 'true');
+    response.say("Welcome to mood checker. I want to know how you're doing.");
+    response.shouldEndSession (false, "How are you feeling? If you would like to leave, just say exit.");
 });
+
+app.intent('HelpIntent',
+  {
+    "slots" : {},
+    "utterances": [
+      "help"
+    ]
+  },
+  function (req,res) {
+    res.say("Rate how you're feeling by saying a number between one and ten. That's all I do for now.");
+  }
+);
+
+app.intent('FeelsIntent',
+  {
+    "slots": {"RATING":"NUMBER"},
+    "utterances": [
+      "{i feel|i am|maybe|around|i'm|about|} {a|around|about|} {a|} {RATING}"]
+  },
+  function(req,res) {
+    res.say("Argh!");
+    //var feel_rating = req.slot('rating');
+    //res.say("You said that you're feeling around a" + rating + "on a scale of one to ten.");
+  }
+);
+
 app.intent('guess',{
 		"slots":{"guess":"NUMBER"}
 		,"utterances":["{1-100|guess}"]
@@ -51,4 +72,10 @@ app.intent('guess',{
 		}
 	}
 );
-module.exports = app;
+exports.handler = app.lambda();
+
+if ((process.argv.length === 3) && (process.argv[2] === 'schema')){
+  console.log (app.schema ());
+  console.log (app.utterances ());
+}
+console.log (app.schema());
