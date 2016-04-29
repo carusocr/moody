@@ -34,14 +34,13 @@ app.intent('HelpIntent',
 
 app.intent('FeelsIntent',
   {
-    "slots": {"RATING":"NUMBER"},
+    "slots": {"rating":"NUMBER"},
     "utterances": [
-      "{i feel|i am|maybe|around|i'm|about|} {a|around|about|} {a|} {RATING}"]
+      "{i feel|i am|maybe|around|i'm|about|} {a|around|about|} {a|} {rating}"]
   },
   function(req,res) {
-    res.say("Argh!");
-    //var feel_rating = req.slot('rating');
-    //res.say("You said that you're feeling around a" + rating + "on a scale of one to ten.");
+    var feel_rating = req.slot('rating');
+    res.say("You said that you're feeling around a" + feel_rating + "on a scale of one to ten. Why is that?");
   }
 );
 
