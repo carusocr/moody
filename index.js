@@ -2,14 +2,29 @@ var alexa = require('alexa-app');
 var mysql = require('mysql');
 var iniparser = require('iniparser')
 var config = iniparser.parseSync('db.ini')
+console.log(config.user);
 //var env = process.env.NODE_ENV || 'dev'; //startup nodejs with e.g:  NODE_ENV= node server.js
 
-//connection = mysql.createConnection({
-//    host        : config[env]['host'],
-//    user        : config[env]['user'],
-//    password    : config[env]['pwd'],
-//    database    : config[env]['dbname']
-//}),
+con = mysql.createConnection({
+    host        : config.host,
+    user        : config.user,
+    password    : config.password,
+    database    : config.database
+});
+
+con.connect(function(err) {
+	if(err){
+		console.log("Can't connect! Check your settings.");
+		return;
+	}
+	console.log("Connection established.");
+});
+
+con.query('select mood from moodchecker',function (err, rows){
+	if(err) throw err;
+
+	console.log(rows[0].mood);
+});
 
 // Define an alexa-app
 var app = new alexa.app('moodchecker');
@@ -78,3 +93,7 @@ if ((process.argv.length === 3) && (process.argv[2] === 'schema')){
   console.log (app.utterances ());
 }
 console.log (app.schema());
+
+con.end(function(err) {
+	//Ends gracefully
+});
